@@ -1,0 +1,18 @@
+{
+    "name": "forever/think-permission",
+    "description": "The ThinkPHP 6.0 Permission Control Package",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eson",
+            "email": "409677557@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.1.0",
+        "topthink/framework": "^6.0.0",
+        "topthink/think-migration": "^3.0"
+    }
+}
