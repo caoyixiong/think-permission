@@ -1,0 +1,82 @@
+<?php
+
+use think\migration\Migrator;
+use Phinx\Db\Adapter\MysqlAdapter;
+
+class CreatePermissionTable extends Migrator
+{
+    /*
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function change()
+    {
+        $tableNames = config('permission.table_names');
+        $columnNames = config('permission.column_names');
+
+        if (empty($tableNames)) {
+            throw new \Exception('Error: config/permission.php not loaded. Please publish the package configuration before proceeding.');
+        }
+
+        $this->table($tableNames['user'], ['comment' => '用户表'])
+            ->addColumn('name', 'string', ['limit' => 50, 'comment' => '用户名称'])
+            ->addColumn('nickname', 'string', ['limit' => 50, 'comment' => '用户昵称'])
+            ->addColumn('password', 'string', ['limit' => 64, 'comment' => '用户密码'])
+            ->addColumn('mobile', 'string', ['limit' => 11, 'comment' => '电话号码'])
+            ->addColumn('avatar', 'string', ['limit' => 255, 'comment' => '用户头像'])
+            ->addColumn('last_login_time', 'datetime', ['comment' => '上次登录时间'])
+            ->addColumn('remark', 'string', ['limit' => 255, 'comment' => '备注'])
+            ->addColumn('status', 'integer', ['limit' => MysqlAdapter::INT_TINY, 'default' => 1, 'comment' => '状态'])
+            ->addColumn('created_at', 'datetime', ['comment' => '创建时间'])
+            ->addColumn('created_by', 'string', ['limit' => 50, 'comment' => '创建人'])
+            ->addColumn('updated_at', 'datetime', ['null' => true, 'comment' => '更新时间'])
+            ->addColumn('updated_by', 'string', ['limit' => 50, 'comment' => '更新时间'])
+            ->addColumn('deleted_at', 'datetime', ['null' => true, 'comment' => '删除时间'])
+            ->addIndex(['name'], ['unique' => true])
+            ->create();
+
+        $this->table($tableNames['role'], ['comment' => '角色表'])
+            ->addColumn('name', 'string', ['limit' => 20, 'default' => '', 'comment' => '角色名称'])
+            ->addColumn('display_name', 'string', ['null' => true, 'comment' => '显示名称'])
+            ->addColumn('description', 'string', ['null' => true, 'comment' => '描述'])
+            ->addColumn('created_at', 'datetime', ['comment' => '创建时间'])
+            ->addColumn('created_by', 'string', ['limit' => 50, 'comment' => '创建人'])
+            ->addColumn('updated_at', 'datetime', ['null' => true, 'comment' => '更新时间'])
+            ->addColumn('updated_by', 'string', ['limit' => 50, 'comment' => '更新时间'])
+            ->addIndex(['name'], ['unique' => true])
+            ->create();
+
+        $this->table($tableNames['user_role'], ['comment' => '用户角色表'])
+            ->addColumn($columnNames['user'], 'integer', ['signed' => true, 'comment' => '用户ID'])
+            ->addColumn($columnNames['role'], 'integer', ['signed' => true, 'comment' => '角色ID'])
+            ->addForeignKey($columnNames['user'], $tableNames['user'], 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->addForeignKey($columnNames['role'], $tableNames['role'], 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->addIndex([$columnNames['user'], $columnNames['role']])
+            ->create();
+
+        $this->table($tableNames['permission'], ['comment' => '权限表'])
+            ->addColumn('parent_id', 'integer', ['default' => 0, 'comment' => '父级ID'])
+            ->addColumn('name', 'string', ['default' => '', 'comment' => '权限名称'])
+            ->addColumn('description', 'string', ['null' => true, 'comment' => '权限描述'])
+            ->addColumn('sort_order', 'integer', ['default' => 0, 'comment' => '排序'])
+            ->addColumn('display_menu', 'integer', ['limit' => MysqlAdapter::INT_TINY, 'default' => 0, 'comment' => '是否显示菜单'])
+            ->addColumn('icon', 'string', ['null' => true, 'comment' => '图标'])
+            ->addColumn('created_at', 'datetime', ['comment' => '创建时间'])
+            ->addColumn('created_by', 'string', ['limit' => 50, 'comment' => '创建人'])
+            ->addColumn('updated_at', 'datetime', ['null' => true, 'comment' => '更新时间'])
+            ->addColumn('updated_by', 'string', ['limit' => 50, 'comment' => '更新时间'])
+            ->addIndex(['name'], ['unique' => true])
+            ->addIndex(['parent_id'])
+            ->create();
+
+        $this->table($tableNames['role_permission'], ['comment' => '角色权限表'])
+            ->addColumn($columnNames['role'], 'integer', ['signed' => true, 'comment' => '角色ID'])
+            ->addColumn($columnNames['permission'], 'integer', ['signed' => true, 'comment' => '权限ID'])
+            ->addForeignKey($columnNames['role'], $tableNames['role'], 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->addForeignKey($columnNames['permission'], $tableNames['permission'], 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->addIndex([$columnNames['role'], $columnNames['permission']])
+            ->create();
+    }
+
+}
