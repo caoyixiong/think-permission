@@ -1,6 +1,14 @@
 {
     "name": "forever/think-permission",
     "description": "The ThinkPHP 6.0 Permission Control Package",
+    "keywords": [
+        "ThinkPHP6",
+        "Composer",
+        "Package",
+        "Rbac",
+        "permission"
+    ],
+    "homepage": "https://github.com/caoyixiong/think-permission",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -14,5 +22,23 @@
         "php": ">=7.1.0",
         "topthink/framework": "^6.0.0",
         "topthink/think-migration": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ForeverEson\\Permission\\": "src"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "extra": {
+        "think":{
+            "services":[
+                "ForeverEson\\Permission\\Service"
+            ],
+            "config":{
+                "permission": "src/config.php"
+            }
+        }
     }
 }
